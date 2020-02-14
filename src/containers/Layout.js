@@ -1,15 +1,4 @@
 import React, { Fragment } from "react";
-import {
-  Container,
-  Divider,
-  Dropdown,
-  Grid,
-  Header,
-  Image,
-  List,
-  Menu,
-  Segment
-} from "semantic-ui-react";
 import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { logout } from "../store/actions/auth";
@@ -22,7 +11,11 @@ class CustomLayout extends React.Component {
   }
   render() {
     const { authenticated, cart } = this.props;
-    console.log(this.props)
+    const menuItems = [
+      { name: 'All', label: 'products' },
+      { name: 'Sportswear', label: 'S' },
+      { name: 'Outerwear', label: 'OW' },
+    ]
     return (
       <div>
         <header class="section-header">
@@ -95,27 +88,15 @@ class CustomLayout extends React.Component {
             <a class="dropdown-item" href="#">Category 3</a>
           </div>
         </li>
-        <li class="nav-item">
-          <Link className="nav-link" to='products'>Products</Link>
+        {menuItems.map(item => {
+          return (
+          <li class="nav-item">
+          <Link 
+          to={`/category/${item.label}`}
+          >{item.name}</Link>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Supermarket</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Electronics</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Baby &amp Toys</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Fitness sport</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Clothing</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Furnitures</a>
-        </li>
+          )
+        })}
       </ul>
     </div> 
   </div> 

@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { BrowserRouter } from 'react-router-dom'
 import App from "./App";
 import registerServiceWorker from "./registerServiceWorker";
 import { createStore, compose, applyMiddleware, combineReducers } from "redux";
@@ -19,9 +20,11 @@ const rootReducer = combineReducers({
 const store = createStore(rootReducer, composeEnhances(applyMiddleware(thunk)));
 
 const app = (
+  <BrowserRouter>
   <Provider store={store}>
     <App />
   </Provider>
+  </BrowserRouter>
 );
 
 ReactDOM.render(app, document.getElementById("root"));
