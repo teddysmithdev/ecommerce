@@ -20,22 +20,21 @@ class OrderSummary extends Component {
     handleFetchOrder = () => {
         this.setState({ loading: true });
         authAxios
-        .get(orderSummaryURL)
-        .then(res => {
+          .get(orderSummaryURL)
+          .then(res => {
             this.setState({ data: res.data, loading: false });
-        })
-        .catch(err => {
+          })
+          .catch(err => {
             if (err.response.status === 404) {
-            this.setState({
+              this.setState({
                 error: "You currently do not have an order",
                 loading: false
-            });
+              });
             } else {
-            this.setState({ error: err, loading: false });
+              this.setState({ error: err, loading: false });
             }
-        });
-    }
-
+          });
+      };
 
     render() {
         const { data, error, loading } = this.state;
@@ -72,10 +71,10 @@ class OrderSummary extends Component {
                     <tr>
                     <td>
                     <figure class="itemside align-items-center">
-                        <div class="aside"><img src={`${order_item.item_obj.image}`} class="img-sm"></img></div>
+                        <div class="aside"><img src={`${order_item.item.image}`} class="img-sm"></img></div>
                         <figcaption class="info">
-                            <a href="#" class="title text-dark">{order_item.item}</a>
-                            <p class="text-muted small">{order_item.item_obj.description}</p>
+                            <a href="#" class="title text-dark">{order_item.item.title}</a>
+                            <p class="text-muted small">{order_item.item.description}</p>
                         </figcaption>
                     </figure>
                 </td>
@@ -84,7 +83,7 @@ class OrderSummary extends Component {
                 </td>
                 <td>
                     <div class="price-wrap">
-                        <var class="price">${order_item.item_obj.price}</var>
+                        <var class="price">${order_item.item.price}</var>
                     </div>
                 </td>
                 <td class="text-right d-none d-md-block">

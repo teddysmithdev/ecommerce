@@ -20,6 +20,13 @@ class ItemListView(ListAPIView):
     serializer_class = ItemSerializer
     queryset = Item.objects.all()
 
+class ItemDetailView(RetrieveAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = ItemSerializer
+    queryset = Item.objects.all()
+
+
+
 class CategoryListView(ListAPIView):
     permission_classes = (AllowAny, )
     serializer_class = ItemSerializer

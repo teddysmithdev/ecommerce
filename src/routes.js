@@ -6,13 +6,15 @@ import Login from "./containers/Login";
 import Signup from "./containers/Signup";
 import HomepageLayout from "./containers/Home";
 import ProductList from './containers/ProductList'
+import ProductDetail from './containers/ProductDetail'
 import OrderSummary from './containers/OrderSummary'
 import Checkout from './containers/Checkout'
 
 const BaseRouter = () => (
   <Hoc>
+    <Route path="/products/:productID" component={ProductDetail} />
     <Route exact path="/products" component={ProductList} />
-    <Route exact path="/ordersummary" component={OrderSummary} />
+    <Route path="/ordersummary" component={OrderSummary} />
     <Route path="/login" component={Login} />
     <Route path="/signup" component={Signup} />
     <Route path="/checkout" component={Checkout} />

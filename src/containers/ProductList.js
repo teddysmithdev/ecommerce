@@ -1,7 +1,10 @@
 import React from 'react'
 import axios from 'axios'
+import { withRouter } from 'react-router-dom'; 
 import { productListURL, addToCartURL } from '../constants'
 import { authAxios } from '../utils'
+import { fetchCart } from "../store/actions/cart";
+import { connect } from "react-redux";
 
 
 class ProductList extends React.Component {
@@ -60,7 +63,7 @@ class ProductList extends React.Component {
                             return (
                           <div class="col-md-3">
                             <div href="#" class="card card-product-grid">
-                            <a href="#" class="img-wrap"> 
+                            <a href="#" class="img-wrap" onClick={() => this.props.history.push(`/products/${item.id}`)}> 
                             <img src="images/items/1.jpg"></img> 
                             </a>
                             <figcaption class="info-wrap">
@@ -84,4 +87,15 @@ class ProductList extends React.Component {
 }
 
 
-export default ProductList
+const mapDispatchToProps = dispatch => {
+  return {
+    refreshCart: () => dispatch(fetchCart())
+  };
+};
+
+export default withRouter(
+  connect(
+    null,
+    mapDispatchToProps
+  )(ProductList)
+);
