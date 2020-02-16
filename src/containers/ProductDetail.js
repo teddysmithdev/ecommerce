@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 import axios from 'axios'
 import { connect } from "react-redux";
 import { withRouter } from 'react-router-dom'
 import { productDetailURL, addToCartURL } from '../constants'
-import { fetchCart } from "../store/actions/cart";
+import { fetchCart, cartStart } from "../store/actions/cart";
 import { authAxios } from '../utils'
 
 
@@ -98,18 +98,6 @@ class ProductDetail extends React.Component {
 
 <p>{item.description}</p>
 
-
-<dl class="row">
-  <dt class="col-sm-3">Model#</dt>
-  <dd class="col-sm-9">Odsy-1000</dd>
-
-  <dt class="col-sm-3">Color</dt>
-  <dd class="col-sm-9">Brown</dd>
-
-  <dt class="col-sm-3">Delivery</dt>
-  <dd class="col-sm-9">Russia, USA, and Europe </dd>
-</dl>
-
 <hr></hr>
 	<div class="form-row">
 		<div class="form-group col-md flex-grow-0">
@@ -124,25 +112,40 @@ class ProductDetail extends React.Component {
 			  </div>
 			</div>
 		</div>
-		<div class="form-group col-md">
-				<label>Select size</label>
-				<div class="mt-1">
-					<label class="custom-control custom-radio custom-control-inline">
-					  <input type="radio" name="select_size" checked="" class="custom-control-input"></input>
-					  <div class="custom-control-label">Small</div>
-					</label>
-
-					<label class="custom-control custom-radio custom-control-inline">
-					  <input type="radio" name="select_size" class="custom-control-input"></input>
-					  <div class="custom-control-label">Medium</div>
-					</label>
-
-					<label class="custom-control custom-radio custom-control-inline">
-					  <input type="radio" name="select_size" class="custom-control-input"></input>
-					  <div class="custom-control-label">Large</div>
-					</label>
-
-				</div>
+		<div class="form-group col-md flex-grow-0">
+    {data.variations &&
+                data.variations.map(v => {
+                  return (
+                    <Fragment key={v.id}>
+                      {/* <div class="card"> */}
+                      <div class="card-body">
+                      <div class="form-inline d-inline-flex ml-luto">
+                      <label as="h3">{v.name}</label>
+                      <select className="ml-2 form-control">
+                   
+                        {v.item_variations.map(iv => {
+                          return (
+                            <option key={iv.id}>
+                              {iv.attachment && (
+                                <img
+                                  size="tiny"
+                                  src={`http://127.0.0.1:8000${iv.attachment}`}
+                                />
+                              )}
+                              
+                                {iv.value}
+                          
+                            </option>
+                          );
+                        })}
+       
+                      </select>
+                      </div>
+                      </div>
+                      {/* </div> */}
+                    </Fragment>
+                  );
+                })}
 		</div>
 	</div>
 

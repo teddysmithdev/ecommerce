@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.http import Http404
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from core.models import Item, Order, OrderItem, Coupon
-from .serializers import ItemSerializer, OrderSerializer
+from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer
 
 import stripe 
 
@@ -23,7 +23,7 @@ class ItemListView(ListAPIView):
 
 class ItemDetailView(RetrieveAPIView):
     permission_classes = (AllowAny,)
-    serializer_class = ItemSerializer
+    serializer_class = ItemDetailSerializer
     queryset = Item.objects.all()
 
 
