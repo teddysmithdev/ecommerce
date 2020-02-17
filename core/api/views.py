@@ -41,6 +41,8 @@ class CategoryListView(ListAPIView):
 class AddToCartView(APIView):
     def post(self, request, *args, **kwargs):
         slug = request.data.get('slug', None)
+        variations = request.data.get('variations', None)
+        print(variations)
         if slug is None:
             return Response({'message':'Invalid request'}, status=HTTP_400_BAD_REQUEST)
         item = get_object_or_404(Item, slug=slug)

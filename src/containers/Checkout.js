@@ -67,8 +67,8 @@ const OrderPreview = props => {
                                 <figure class="itemside  mb-3">
                                     <div class="aside"><img src="images/items/1.jpg" class="border img-xs"></img></div>
                                     <figcaption class="info">
-                                        <p>{order_item.item}</p>
-                                        <span>{order_item.quantity}x ${order_item.item_obj.price} = Total: ${data.total} </span>
+                                        <p>{order_item.item.title}</p>
+                                        <span>{order_item.item.quantity}x ${order_item.item.price} = Total: ${data.total} </span>
                                     </figcaption>
                                 </figure>
                             </div>
