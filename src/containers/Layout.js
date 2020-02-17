@@ -48,7 +48,9 @@ class CustomLayout extends React.Component {
         </Link>
 			</div>
 			<div class="widget-header icontext">
+        <Link to='/profile'>
 				<a href="#" class="icon icon-sm rounded-circle border"><i class="fa fa-user"></i></a>
+        </Link>
 				<div class="text">
 					<span class="text-muted">Welcome!</span>
 					<div> 

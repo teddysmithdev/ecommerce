@@ -36,6 +36,14 @@ class OrderSummary extends Component {
           });
       };
 
+      renderVariations = orderItem => {
+        let text = '';
+        orderItem.item_variations.forEach(iv => {
+            text += `${iv.variation.name}: ${iv.value}`
+        })
+        return text;
+      }
+
     render() {
         const { data, error, loading } = this.state;
         console.log(data)
@@ -75,6 +83,7 @@ class OrderSummary extends Component {
                         <figcaption class="info">
                             <a href="#" class="title text-dark">{order_item.item.title}</a>
                             <p class="text-muted small">{order_item.item.description}</p>
+                            <p class="text-muted small">{this.renderVariations(order_item)}</p>
                         </figcaption>
                     </figure>
                 </td>

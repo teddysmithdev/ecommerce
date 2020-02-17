@@ -145,11 +145,9 @@ class ProductDetail extends React.Component {
                       <div class="form-inline d-inline-flex ml-luto">
                       <label as="h3">{v.name}</label>
                       <select className="ml-2 form-control" name={name}  onChange={this.handleChange}>
-                   
                         {v.item_variations.map(iv => {
                           return (
                             <option
-                            onChange={this.handleChange}
                             key={iv.id} 
                             value={iv.id}
                             >
@@ -157,7 +155,6 @@ class ProductDetail extends React.Component {
                             </option>
                           );
                         })}
-
                       </select>
                       </div>
                       </div>
@@ -165,11 +162,10 @@ class ProductDetail extends React.Component {
                     </Fragment>
                   );
                 })}
+                <a onClick={() => this.handleAddToCart(item.slug)} type="submit" class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
               </form>
               </div>
             </div>
-            <a href="#" class="btn  btn-primary"> Buy now </a>
-            <a onClick={() => this.handleAddToCart(item.slug)} class="btn  btn-outline-primary"> <span class="text">Add to cart</span> <i class="fas fa-shopping-cart"></i>  </a>
           </article>
               </main>
             </div>

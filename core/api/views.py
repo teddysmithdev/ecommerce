@@ -1,15 +1,16 @@
+from django_countries import countries
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from django.conf import settings
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.response import Response
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.http import Http404
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
-from core.models import Item, Order, OrderItem, Coupon
-from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer
+from core.models import Item, Order, OrderItem, Coupon, Variation, ItemVariation, Address
+from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer, AddressSerializer
 
 import stripe 
 
@@ -41,25 +42,45 @@ class CategoryListView(ListAPIView):
 class AddToCartView(APIView):
     def post(self, request, *args, **kwargs):
         slug = request.data.get('slug', None)
-        variations = request.data.get('variations', None)
+        variations = request.data.get('variations', [])
         print(variations)
         if slug is None:
             return Response({'message':'Invalid request'}, status=HTTP_400_BAD_REQUEST)
         item = get_object_or_404(Item, slug=slug)
-        order_item, created = OrderItem.objects.get_or_create(
+
+        minimum_variation_count = Variation.objects.filter(item=item).count()
+        if len(variations) < minimum_variation_count:
+            return Response({"message": "Please specify the required variations"}, status=HTTP_400_BAD_REQUEST)
+
+        order_item_qs = OrderItem.objects.filter(
             item=item,
             user=request.user,
             ordered=False
         )
+
+        for v in variations:
+            order_item_qs = order_item_qs.filter(
+                item_variations__exact=v
+            )
+        
+        if order_item_qs.exists():
+            order_item = order_item_qs.first()
+            order_item.quantity += 1
+            order_item.save()
+        else:
+            order_item = OrderItem.objects.create(
+                item=item,
+                user=request.user,
+                ordered=False
+            )
+            order_item.item_variations.add(*variations)
+            order_item.save()
+
         order_qs = Order.objects.filter(user=request.user, ordered=False)
         if order_qs.exists():
             order = order_qs[0]
             # check if the order item is in the order
-            if order.items.filter(item__slug=item.slug).exists():
-                order_item.quantity += 1
-                order_item.save()
-                return Response(status=HTTP_200_OK)
-            else:
+            if not order.items.filter(item__id=order_item.id).exists():
                 order.items.add(order_item)
                 return Response(status=HTTP_200_OK)
         else:
@@ -190,3 +211,21 @@ class AddCouponView(APIView):
         order.coupon = coupon
         order.save()
         return Response(status=HTTP_200_OK)
+
+class CountryListView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response(countries, status=HTTP_200_OK)
+
+
+class AddressCreateView(CreateAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = AddressSerializer
+    queryset = Address.objects.all()
+
+
+class AddressListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)

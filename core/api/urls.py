@@ -7,11 +7,17 @@ from .views import (
     OrderDetailView, 
     PaymentView, 
     AddCouponView,
+    AddressListView,
+    AddressCreateView,
+    CountryListView
 )
 
 
 
 urlpatterns = [
+    path('addresses/', AddressListView.as_view(), name='address-list'),
+    path('countries/', CountryListView.as_view(), name='country-list'),
+    path('addresses/create', AddressCreateView.as_view(), name='address-create'),
     path('products/', ItemListView.as_view(), name='product-list'),
     path('products/<pk>', ItemDetailView.as_view(), name='product-detail'),
     path('category/<category>', CategoryListView.as_view(), name='product-detail'),

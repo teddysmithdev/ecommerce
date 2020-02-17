@@ -9,6 +9,7 @@ import ProductList from './containers/ProductList'
 import ProductDetail from './containers/ProductDetail'
 import CategoryList from './containers/CategoryList'
 import OrderSummary from './containers/OrderSummary'
+import Profile from './containers/Profile'
 import Checkout from './containers/Checkout'
 
 const BaseRouter = () => (
@@ -17,6 +18,7 @@ const BaseRouter = () => (
     <Route exact path="/category/:catergoryID" component={CategoryList} />
     <Route exact path="/products" component={ProductList} />
     <Route path="/ordersummary" component={OrderSummary} />
+    <Route path="/profile" component={Profile} />
     <Route path="/login" component={Login} />
     <Route path="/signup" component={Signup} />
     <Route path="/checkout" component={Checkout} />

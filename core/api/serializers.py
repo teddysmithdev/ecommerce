@@ -181,3 +181,19 @@ class ItemDetailSerializer(serializers.ModelSerializer):
 
     def get_variations(self, obj):
         return VariationSerializer(obj.variation_set.all(), many=True).data
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    country = CountryField()
+    class Meta:
+        model = Address
+        fields = (
+            'id',
+            'title',
+            'price',
+            'country',
+            'zip',
+            'address_type',
+            'default'
+
+        )
