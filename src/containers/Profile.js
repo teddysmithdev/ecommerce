@@ -8,19 +8,38 @@ class Profile extends React.Component {
 	state = { 
 		activeItem: 'billingAddress',
 		error: false,
-		loading: false
+		loading: false,
+		addresses: [],
+		countries: [],
+		formData: {default: false},
 	}
 
 		componentDidMount() {
 			this.handleFetchAddresses()
 			this.handleFetchCountries()
 		}
+
+		handleItemClick = name => {
+			this.setState({ activeItem: name }, () => {
+			  this.handleFetchAddresses();
+			});
+		  };
+
+		handleFormatCountries = countries => {
+			const keys = Object.keys(countries)
+			return keys.map(k => {
+				return {
+					id: k, 
+					name: countries[k]
+				}
+			})
+		}
 		
 		handleFetchCountries = () => {
 				authAxios.get(countryListURL)
 				.then(res => {
 					this.setState({ 
-						address: res.data, loading: false})
+						countries: this.handleFormatCountries(res.data)})
 				})
 				.catch(err => {
 					this.setState({
@@ -35,7 +54,7 @@ class Profile extends React.Component {
 			authAxios.get(addressListURL)
 			.then(res => {
 				this.setState({ 
-					address: res.data, loading: false})
+					addresses: res.data, loading: false})
 			})
 			.catch(err => {
 				this.setState({
@@ -55,103 +74,123 @@ class Profile extends React.Component {
 			})
 		}
 
+		handleSelectChange= (e) => {
+			const {formData} = this.state;
+			const updateFormData = {
+				...formData,
+			[e.target.name] : e.target.value
+			}
+			this.setState({
+				formData: updateFormData
+			})
+		}
+		handleToggleDefault = (e) => {
+			const {formData} = this.state;
+			const updateFormData = {
+				...formData,
+				default: formData.default
+			}
+			this.setState({
+				formData: updateFormData
+			})
+		}
+
 		handleCreateAddress = e => {
+			this.setState({ saving: true })
 			e.preventDefault()
-			const { formData } = this.state
-			console.log(formData)
+			const { activeItem, formData } = this.state
+			authAxios.post(addressCreateURL, {
+				...formData,
+				address_type: activeItem === 'billingAddress' ? 'B' : 'S'
+			})
+			.then(res => {
+				this.setState({ saving: false, success: true })
+			})
+			.catch(err => {
+				this.setState({ error: err })
+			})
 		}
 
 
 		render() {
+			const { error, loading, addresses, countries, activeItem, formData } = this.state
+			let countriesList = countries.length > 0
+			&& countries.map((item, i) => {
+			return (
+				<option key={i} value={item.id}>{item.name}</option>
+			)
+			}, this);
         return (
             		<section class="section-content padding-y">
 						<div class="container">
 						<div class="row">
-							<aside class="col-md-3">
+						{error && (
+						<div class="alert alert-danger" role="alert">
+						{JSON.stringify(error) }
+						</div>
+						)}
+						{loading && (
+						<div class="spinner-border" role="status">
+						<span class="sr-only">Loading...</span>
+						</div>
+						)}
+
+
+							<aside class="col-md-3 mb-3">
 								<ul class="list-group">
-									<a class="list-group-item active" href="#"> Billing Address  </a>
-									<a class="list-group-item" href="#"> Shipping Address </a>
+									<a 
+									class={activeItem == 'billingAddress' ? 'list-group-item active' : 'list-group-item'} 
+									onClick={() => this.handleItemClick('billingAddress')}> Billing Address  </a>
+									<a 
+									class={activeItem == 'shippingAddress' ? 'list-group-item active' : 'list-group-item'} 
+									onClick={() => this.handleItemClick('shippingAddress')}> Shipping Address </a>
 								</ul>
 							</aside>
 							<main class="col-md-9">
-							<form>
+								{
+									activeItem === 'billingAddress' ? <h1>Billing Address Form</h1> : <h1>Shipping Address Form</h1>
+								}
+							<form onSubmit={this.handleCreateAddress}>
 						<div class="form-row mt-3">
 						</div>
 						<div class="form-group">
 							<label for="inputAddress">Address</label>
-							<input type="text" class="form-control" onChange={this.handleChange} placeholder="1234 Main St"></input>
+							<input type="text" class="form-control" name='street_address' onChange={this.handleChange} placeholder="1234 Main St"></input>
 						</div>
 						<div class="form-group">
 							<label for="inputAddress2">Address 2</label>
-							<input type="text" class="form-control" onChange={this.handleChange} placeholder="Apartment, studio, or floor"></input>
+							<input type="text" class="form-control" name='apartment_address' onChange={this.handleChange} placeholder="Apartment, studio, or floor"></input>
 						</div>
 						<div class="form-row">
 							<div class="form-group col-md-6">
 							<label for="inputCity">City</label>
-							<input type="text" class="form-control" onChange={this.handleChange}></input>
+							<input type="text" class="form-control" name='city' onChange={this.handleChange}></input>
 							</div>
 							<div class="form-group col-md-4">
 							<label for="inputState">State</label>
-							<select id="inputState" class="form-control">
-								<option selected>Choose...</option>
-								<option>...</option>
+							<input type="text" class="form-control" name='state' onChange={this.handleChange}></input>
+							</div>
+							<div class="form-group col-md-4">
+							<label for="inputState">Country</label>
+							<select class="form-control bfh-countries" name='country' onChange={this.handleChange}>
+								{countriesList}
 							</select>
 							</div>
 							<div class="form-group col-md-2">
 							<label for="inputZip">Zip</label>
-							<input type="text" class="form-control" onChange={this.handleChange}></input>
+							<input type="text" class="form-control" name='zip code' onChange={this.handleChange}></input>
+							</div>
+							<div class="form-check">
+							<input type="checkbox" class="form-check-input" name='default' onChange={this.handleSelectChange}></input>
+							<label class="form-check-label" for="exampleCheck1">Make default address?</label>
 							</div>
 						</div>
-						<button type="submit" class="btn btn-primary">Sign in</button>
+						<button type="submit" class="btn btn-primary mt-3">Submit</button>
 						</form>
-						<article class="card mb-3">
-						<div class="card-body">
-				
-				<figure class="icontext">
-						<div class="icon">
-							<img class="rounded-circle img-sm border" src="images/avatars/avatar3.jpg"></img>
-						</div>
-						<div class="text">
-							<strong> Mr. Jackson Someone </strong>
-							<a href="#">Edit</a>
-						</div>
-				</figure>
-				<hr></hr>
-				<p>
-					<i class="fa fa-map-marker text-muted"></i>My address:
-					Tashkent city, Street name, Building 123, House 321 &nbsp 
-					<a href="#" class="btn-link"> Edit</a>
-				</p>
-				<article class="card-group">
-					<figure class="card bg">
-						<div class="p-3">
-							 <h5 class="card-title">38</h5>
-							<span>Orders</span>
-						</div>
-					</figure>
-					<figure class="card bg">
-						<div class="p-3">
-							 <h5 class="card-title">5</h5>
-							<span>Wishlists</span>
-						</div>
-					</figure>
-					<figure class="card bg">
-						<div class="p-3">
-							 <h5 class="card-title">12</h5>
-							<span>Awaiting delivery</span>
-						</div>
-					</figure>
-					<figure class="card bg">
-						<div class="p-3">
-							 <h5 class="card-title">50</h5>
-							<span>Delivered items</span>
-						</div>
-					</figure>
-				</article>
-				
-
-			</div>
-		</article>
+						{ addresses.map(i => {
+							return <p>{i.addresses}</p>
+						})}
+					
 
 		<article class="card  mb-3">
 			<div class="card-body">
