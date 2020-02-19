@@ -189,8 +189,10 @@ class AddressSerializer(serializers.ModelSerializer):
         model = Address
         fields = (
             'id',
-            'title',
-            'price',
+            'user',
+            'street_address',
+            'city',
+            'state',
             'country',
             'zip',
             'address_type',

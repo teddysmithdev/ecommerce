@@ -167,6 +167,8 @@ class Address(models.Model):
     apartment_address = models.CharField(max_length=100)
     country = CountryField(multiple=False)
     zip = models.CharField(max_length=100)
+    city = models.CharField(max_length=100, default='default')
+    state = models.CharField(max_length=100, default='default')
     address_type = models.CharField(max_length=1, choices=ADDRESS_CHOICES)
     default = models.BooleanField(default=False)
 

@@ -9,12 +9,14 @@ from .views import (
     AddCouponView,
     AddressListView,
     AddressCreateView,
-    CountryListView
+    CountryListView,
+    UserIDView
 )
 
 
 
 urlpatterns = [
+    path('user-id/', UserIDView.as_view(), name='user-id'),
     path('addresses/', AddressListView.as_view(), name='address-list'),
     path('countries/', CountryListView.as_view(), name='country-list'),
     path('addresses/create', AddressCreateView.as_view(), name='address-create'),

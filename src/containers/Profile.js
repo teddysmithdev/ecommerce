@@ -1,5 +1,5 @@
 import React from 'react'
-import { addressListURL, addressCreateURL, countryListURL } from '../constants'
+import { addressListURL, addressCreateURL, countryListURL, userIDURL } from '../constants'
 import { authAxios } from '../utils'
 
 
@@ -12,11 +12,15 @@ class Profile extends React.Component {
 		addresses: [],
 		countries: [],
 		formData: {default: false},
+		saving: false,
+		success: false,
+		userID: null
 	}
 
 		componentDidMount() {
 			this.handleFetchAddresses()
 			this.handleFetchCountries()
+			this.handleFetchUserID()
 		}
 
 		handleItemClick = name => {
@@ -30,7 +34,7 @@ class Profile extends React.Component {
 			return keys.map(k => {
 				return {
 					id: k, 
-					name: countries[k]
+					name: countries[k],
 				}
 			})
 		}
@@ -40,6 +44,20 @@ class Profile extends React.Component {
 				.then(res => {
 					this.setState({ 
 						countries: this.handleFormatCountries(res.data)})
+				})
+				.catch(err => {
+					this.setState({
+						error: err
+					})
+				})
+			}
+
+		handleFetchUserID = () => {
+				authAxios.get(userIDURL)
+				.then(res => {
+					console.log(res)
+					this.setState({ 
+						userID: res.data.userID })
 				})
 				.catch(err => {
 					this.setState({
@@ -98,12 +116,14 @@ class Profile extends React.Component {
 		handleCreateAddress = e => {
 			this.setState({ saving: true })
 			e.preventDefault()
-			const { activeItem, formData } = this.state
+			const { activeItem, formData, userID } = this.state
 			authAxios.post(addressCreateURL, {
 				...formData,
+				user: userID,
 				address_type: activeItem === 'billingAddress' ? 'B' : 'S'
 			})
 			.then(res => {
+				console.log(res)
 				this.setState({ saving: false, success: true })
 			})
 			.catch(err => {
@@ -113,7 +133,7 @@ class Profile extends React.Component {
 
 
 		render() {
-			const { error, loading, addresses, countries, activeItem, formData } = this.state
+			const { error, loading, addresses, countries, activeItem, saving, success } = this.state
 			let countriesList = countries.length > 0
 			&& countries.map((item, i) => {
 			return (
@@ -150,7 +170,7 @@ class Profile extends React.Component {
 								{
 									activeItem === 'billingAddress' ? <h1>Billing Address Form</h1> : <h1>Shipping Address Form</h1>
 								}
-							<form onSubmit={this.handleCreateAddress}>
+							<form onSubmit={this.handleCreateAddress} success={success}>
 						<div class="form-row mt-3">
 						</div>
 						<div class="form-group">
@@ -178,60 +198,73 @@ class Profile extends React.Component {
 							</div>
 							<div class="form-group col-md-2">
 							<label for="inputZip">Zip</label>
-							<input type="text" class="form-control" name='zip code' onChange={this.handleChange}></input>
+							<input type="text" class="form-control" name='zip' onChange={this.handleChange}></input>
 							</div>
 							<div class="form-check">
 							<input type="checkbox" class="form-check-input" name='default' onChange={this.handleSelectChange}></input>
 							<label class="form-check-label" for="exampleCheck1">Make default address?</label>
 							</div>
 						</div>
-						<button type="submit" class="btn btn-primary mt-3">Submit</button>
+						<button disable={saving} loading={saving} type="submit" class="btn btn-primary mt-3">Submit</button>
 						</form>
-						{ addresses.map(i => {
-							return <p>{i.addresses}</p>
+						{addresses.map(i => {
+							return (
+								<article class="card mb-3">
+			<div class="card-body">
+				
+				<figure class="icontext">
+						<div class="icon">
+							<img class="rounded-circle img-sm border" src="images/avatars/avatar3.jpg"></img>
+						</div>
+						<div class="text">
+							<strong> {i.user} </strong> <br></br>
+							myloginname@gmail.com <br></br>
+							<a href="#">Edit</a>
+						</div>
+				</figure>
+				<hr></hr>
+				<p>
+					<i class="fa fa-map-marker text-muted"></i> &nbsp; My address:  
+					 <br></br>
+					{i.city}, {i.street_address}, {i.country}, {i.state} {i.zip}
+				</p>
+
+				
+
+				<article class="card-group">
+					<figure class="card bg">
+						<div class="p-3">
+							 <h5 class="card-title">38</h5>
+							<span>Orders</span>
+						</div>
+					</figure>
+					<figure class="card bg">
+						<div class="p-3">
+							 <h5 class="card-title">5</h5>
+							<span>Wishlists</span>
+						</div>
+					</figure>
+					<figure class="card bg">
+						<div class="p-3">
+							 <h5 class="card-title">12</h5>
+							<span>Awaiting delivery</span>
+						</div>
+					</figure>
+					<figure class="card bg">
+						<div class="p-3">
+							 <h5 class="card-title">50</h5>
+							<span>Delivered items</span>
+						</div>
+					</figure>
+				</article>
+				
+
+			</div>
+		</article>
+							)
 						})}
 					
 
-		<article class="card  mb-3">
-			<div class="card-body">
-				<h5 class="card-title mb-4">Recent orders </h5>	
-
-				<div class="row">
-				<div class="col-md-6">
-					<figure class="itemside  mb-3">
-						<div class="aside"><img src="images/items/1.jpg" class="border img-sm"></img></div>
-						<figcaption class="info">
-							<time class="text-muted"><i class="fa fa-calendar-alt"></i> 12.09.2019</time>
-							<p>Great item name goes here </p>
-							<span class="text-warning">Pending</span>
-						</figcaption>
-					</figure>
-				</div>
-				<div class="col-md-6">
-					<figure class="itemside  mb-3">
-						<div class="aside"><img src="images/items/2.jpg" class="border img-sm"></img></div>
-						<figcaption class="info">
-							<time class="text-muted"><i class="fa fa-calendar-alt"></i> 12.09.2019</time>
-							<p>Machine for kitchen to blend </p>
-							<span class="text-success">Departured</span>
-						</figcaption>
-					</figure>
-				</div>
-				<div class="col-md-6">
-					<figure class="itemside mb-3">
-						<div class="aside"><img src="images/items/3.jpg" class="border img-sm"></img></div>
-						<figcaption class="info">
-							<time class="text-muted"><i class="fa fa-calendar-alt"></i> 12.09.2019</time>
-							<p>Ladies bag original leather </p>
-							<span class="text-success">Shipped  </span>
-						</figcaption>
-					</figure>
-				</div>
-			</div>
-
-			<a href="#" class="btn btn-outline-primary"> See all orders  </a>
-			</div>
-		</article>
 
 	</main>
 </div>
