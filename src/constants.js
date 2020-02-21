@@ -6,7 +6,7 @@ export const endpoint = `${localhost}${apiURL}`;
 
 export const productListURL = `${endpoint}/products/`;
 export const userIDURL = `${endpoint}/user-id/`;
-export const addressListURL = `${endpoint}/addresses/`;
+export const addressListURL = addressType => `${endpoint}/addresses/?address_type=${addressType}`;
 export const addressCreateURL = `${endpoint}/addresses/create`;
 export const productDetailURL = id => `${endpoint}/products/${id}`;
 export const categoryURL = id => `${endpoint}/category/${id}`;

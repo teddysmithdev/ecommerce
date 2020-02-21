@@ -69,7 +69,8 @@ class Profile extends React.Component {
 
 		handleFetchAddresses = () => {
 			this.setState({ loading: true })
-			authAxios.get(addressListURL)
+			const {activeItem} = this.state
+			authAxios.get(addressListURL(activeItem == 'billingAddress' ? 'B' : 'S'))
 			.then(res => {
 				this.setState({ 
 					addresses: res.data, loading: false})

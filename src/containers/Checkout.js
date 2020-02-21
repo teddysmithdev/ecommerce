@@ -1,8 +1,9 @@
 import React, {Component, Fragment} from 'react';
 import {injectStripe, Elements, CardElement} from 'react-stripe-elements';
 import {StripeProvider} from 'react-stripe-elements';
+import { Link } from 'react-router-dom'
 import { authAxios } from '../utils';
-import { checkoutURL, orderSummaryURL, addCouponURL } from '../constants'
+import { checkoutURL, orderSummaryURL, addCouponURL, addressListURL } from '../constants'
 
 
 
@@ -51,7 +52,6 @@ class CouponForm extends Component {
 
 const OrderPreview = props => {
     const { data } = props;
-    console.log(data)
         return (
             <Fragment>
                 {data && (
@@ -112,12 +112,27 @@ class CheckoutForm extends React.Component {
         data: null,
         loading: false,
         error: null,
-        success: false
+        success: false,
+        billingAddresses: [],
+        shippingAddresses: [],
+        selectedBillingAdress: '',
+        selectedShippingAddress: ''
     }
 
     componentDidMount() {
         this.handleFetchOrder()
+        this.handleFetchBillingAddresses()
+        this.handleFetchShippingAddresses()
     }
+
+    handleGetDefaultAddress = addresses => {
+        const filteredAddresses = addresses.filter(el => el.default === true)
+        if (filteredAddresses.length > 0) {
+            return filteredAddresses[0]
+            }
+            return ''
+    }
+
 
     handleFetchOrder = () => {
         this.setState({ loading: true });
@@ -125,6 +140,30 @@ class CheckoutForm extends React.Component {
         .get(orderSummaryURL)
         .then(res => {
             this.setState({ data: res.data, loading: false });
+        })
+        .catch(err => {
+            this.setState({
+                error: "You currently do not have an order",
+                loading: false
+            });
+        });
+    }
+
+    handleFetchBillingAddresses = () => {
+        this.setState({ loading: true });
+        authAxios
+        .get(addressListURL('B'))
+        .then(res => {
+            this.setState({ billingAddresses: res.data.map(a => {
+                return {
+                    key: a.id,
+                    text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
+                    value: a.id
+                }
+            }),
+            selectedShippingAddress: this.handleGetDefaultAddress(res.data),
+            loading: false 
+        });
         })
         .catch(err => {
             if (err.response.status === 404) {
@@ -138,6 +177,35 @@ class CheckoutForm extends React.Component {
         });
     }
 
+    handleSelectChange = (e) => {
+        this.setState({ [e.target.name]:[e.target.value]})
+    }
+
+    handleFetchShippingAddresses = () => {
+        this.setState({ loading: true });
+        authAxios
+        .get(addressListURL('S'))
+        .then(res => {
+            this.setState({ shippingAddresses: res.data.map(a => {
+                return {
+                    key: a.id,
+                    text: `${a.street_address}, ${a.apartment_address}, ${a.country}`,
+                    value: a.id
+                }
+            }),
+            selectedShippingAddress: this.handleGetDefaultAddress(res.data),
+            loading: false 
+        });
+        })
+        .catch(err => {
+            this.setState({
+                error: "You currently do not have an order",
+                loading: false
+            });
+            this.setState({ error: err, loading: false });
+        });
+    }
+
     submit = (ev) => {
     ev.preventDefault();
     this.setState({ loading: true })
@@ -145,8 +213,9 @@ class CheckoutForm extends React.Component {
         if(result.error){
             this.setState({ error: result.error.message, loading: false })
         } else {
+        const {selectedBillingAddress, selectedShippingAddress} = this.state;
         authAxios
-        .post(checkoutURL, {stripeToken: result.token.id})
+        .post(checkoutURL, {stripeToken: result.token.id, selectedBillingAddress, selectedShippingAddress})
         .then(res => {
             this.setState({ loading: false, success: true})
         })
@@ -172,10 +241,11 @@ handleAddCoupon = (e, code) => {
       });
   };
   render() {
-      const { error, loading, success, data } = this.state
+      const { error, loading, success, data, billingAddresses, shippingAddresses, selectedBillingAddress, selectedShippingAddress } = this.state
+   
     return (
         <div>
-        {/* {success && 
+        {success && 
         <div>
         <div class="alert alert-primary">
             Payment successful!
@@ -194,14 +264,47 @@ handleAddCoupon = (e, code) => {
           <div class="loading">
               loading...
             </div>
-        )} */}
+        )}    
         <div className="container">
             <OrderPreview data={data} />
             <CouponForm
             handleAddCoupon={(e, code) => this.handleAddCoupon(e, code)}
             />
-            <CardElement />
-            <button class="btn btn-primary mt-4" onClick={this.submit}>Submit Payment</button>
+            <h2>Would you like to complete purchase?</h2>
+            {billingAddresses && (
+                <div class="form-group">
+                <label for="sel1">Billing Addresses:</label>
+                <select value={selectedBillingAddress} onChange={this.handleSelectChange} name='selectedBillingAddresses' class="form-control" id="sel1">
+                  {billingAddresses.map(i => {
+                    return <option value={i.text}>{i.text}</option>
+                  })
+                }
+                </select>
+              </div>
+            )}
+            {shippingAddresses && (
+                <div class="form-group">
+                <label for="sel1">Shipping Addresses:</label>
+                <select onChange={this.handleSelectChange} name='selectedShippingAddress' class="form-control" id="sel1">
+                  {billingAddresses.map(i => {
+                    return <option value={i.text}>{i.text}</option>
+                  })
+                }
+                </select>
+              </div>
+            )}
+             {shippingAddresses.length > 0 ? <p>You need to <Link to='/profile'>add a shipping address</Link></p> : (
+                <Fragment>
+                   <CardElement />
+                    <button class="btn btn-primary mt-4" onClick={this.submit}>Submit Payment</button> 
+                </Fragment>
+            )}
+            {billingAddresses.length < 1 || shippingAddresses < 1 ? <p>You need to <Link to='/profile'>add an address</Link></p> : (
+                <Fragment>
+                   <CardElement />
+                    <button class="btn btn-primary mt-4" onClick={this.submit}>Submit Payment</button> 
+                </Fragment>
+            )}
         </div>
         </div>
     );

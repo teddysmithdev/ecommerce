@@ -111,8 +111,12 @@ class PaymentView(APIView):
         order = Order.objects.get(user=self.request.user, ordered=False)
         userprofile = UserProfile.objects.get(user=self.request.user)
         token = request.data.get('stripeToken')
-        save = False
-        use_default = False
+        billing_address_id = request.data('selectedShippingAddress')
+        shipping_address_id = request.data.get('selectedBillingAddress')
+
+        billing_address = Address.objects.get(id=billing_address_id)
+        shipping_address = Address.objecs.get(id=shipping_address_id)
+
         if save:
             if userprofile.stripe_customer_id != '' and userprofile.stripe_customer_id is not None:
                 customer = stripe.Customer.retrieve(
@@ -232,4 +236,8 @@ class AddressListView(ListAPIView):
     serializer_class = AddressSerializer
 
     def get_queryset(self):
-        return Address.objects.filter(user=self.request.user)
+        address_type = self.request.query_params.get('address_type', None)
+        qs = Address.objects.all()
+        if address_type is None:
+            return qs 
+        return qs.filter(user=self.request.user, address_type=address_type)
