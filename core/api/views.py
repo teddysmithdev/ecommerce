@@ -9,7 +9,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.http import Http404
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
-from core.models import Item, Order, OrderItem, Coupon, Variation, ItemVariation, Address
+from core.models import Item, Order, OrderItem, Coupon, Variation, ItemVariation, Address, UserProfile
 from .serializers import ItemSerializer, OrderSerializer, ItemDetailSerializer, AddressSerializer
 
 import stripe 
@@ -111,45 +111,33 @@ class PaymentView(APIView):
         order = Order.objects.get(user=self.request.user, ordered=False)
         userprofile = UserProfile.objects.get(user=self.request.user)
         token = request.data.get('stripeToken')
-        billing_address_id = request.data('selectedShippingAddress')
-        shipping_address_id = request.data.get('selectedBillingAddress')
-
+        billing_address_id = request.data.get('selectedBillingAddress')
+        shipping_address_id = request.data.get('selectedShippingAddress') 
         billing_address = Address.objects.get(id=billing_address_id)
         shipping_address = Address.objecs.get(id=shipping_address_id)
 
-        if save:
-            if userprofile.stripe_customer_id != '' and userprofile.stripe_customer_id is not None:
-                customer = stripe.Customer.retrieve(
-                    userprofile.stripe_customer_id)
-                customer.sources.create(source=token)
+        if userprofile.stripe_customer_id != '' and userprofile.stripe_customer_id is not None:
+            customer = stripe.Customer.retrieve(
+                userprofile.stripe_customer_id)
+            customer.sources.create(source=token)
 
-            else:
-                customer = stripe.Customer.create(
-                    email=self.request.user.email,
-                )
-                customer.sources.create(source=token)
-                userprofile.stripe_customer_id = customer['id']
-                userprofile.one_click_purchasing = True
-                userprofile.save()
+        else:
+            customer = stripe.Customer.create(
+                email=self.request.user.email,
+            )
+            customer.sources.create(source=token)
+            userprofile.stripe_customer_id = customer['id']
+            userprofile.one_click_purchasing = True
+            userprofile.save()
 
         amount = int(order.get_total() * 100)
 
         try:
-
-            if use_default or save:
-                # charge the customer because we cannot charge the token more than once
-                charge = stripe.Charge.create(
-                    amount=amount,  # cents
-                    currency="usd",
-                    customer=userprofile.stripe_customer_id
-                )
-            else:
-                # charge once off on the token
-                charge = stripe.Charge.create(
-                    amount=amount,  # cents
-                    currency="usd",
-                    source=token
-                )
+            charge = stripe.Charge.create(
+                amount=amount,  # cents
+                currency="usd",
+                source=token
+            )
 
             # create the payment
             payment = Payment()
@@ -167,6 +155,8 @@ class PaymentView(APIView):
 
             order.ordered = True
             order.payment = payment
+            order.billing_address = billing_address
+            order.shipping_address = shipping_address
             order.ref_code = create_ref_code()
             order.save()
 

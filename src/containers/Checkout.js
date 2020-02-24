@@ -128,7 +128,7 @@ class CheckoutForm extends React.Component {
     handleGetDefaultAddress = addresses => {
         const filteredAddresses = addresses.filter(el => el.default === true)
         if (filteredAddresses.length > 0) {
-            return filteredAddresses[0]
+            return filteredAddresses[0].id
             }
             return ''
     }
@@ -242,7 +242,7 @@ handleAddCoupon = (e, code) => {
   };
   render() {
       const { error, loading, success, data, billingAddresses, shippingAddresses, selectedBillingAddress, selectedShippingAddress } = this.state
-   
+    console.log(this.state)
     return (
         <div>
         {success && 
@@ -257,7 +257,7 @@ handleAddCoupon = (e, code) => {
         }
         {error && 
         <div class="alert alert-danger">
-        Error: {error}
+        {/* Error: {error} */}
           </div>
         }
         {loading && (
@@ -274,7 +274,7 @@ handleAddCoupon = (e, code) => {
             {billingAddresses && (
                 <div class="form-group">
                 <label for="sel1">Billing Addresses:</label>
-                <select value={selectedBillingAddress} onChange={this.handleSelectChange} name='selectedBillingAddresses' class="form-control" id="sel1">
+                <select onChange={this.handleSelectChange} name='selectedBillingAddress' class="form-control" id="sel1">
                   {billingAddresses.map(i => {
                     return <option value={i.text}>{i.text}</option>
                   })
@@ -315,7 +315,8 @@ handleAddCoupon = (e, code) => {
 const InjectedForm = injectStripe(CheckoutForm)
 
 const WrappedForm = () => (
-    <StripeProvider apiKey="pk_test_12345">
+    <StripeProvider apiKey="	
+    pk_test_V5aity6lps6WGX4FCJlc46uL002wlu8cou">
         <Elements>
             <InjectedForm />
         </Elements>
