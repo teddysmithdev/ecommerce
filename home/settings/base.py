@@ -24,7 +24,7 @@ INSTALLED_APPS = [
     'rest_auth.registration',
     'rest_framework',
     'rest_framework.authtoken',
-
+    'django_filters',
     'core'
 ]
 
@@ -77,6 +77,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'rest_framework_filters.backends.DjangoFilterBackend',
+    )
 }
 
 ACCOUNT_EMAIL_REQUIRED = False

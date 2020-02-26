@@ -3,6 +3,7 @@ import { Link, withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { logout } from "../store/actions/auth";
 import { fetchCart } from '../store/actions/cart'
+import logo from '../assets/logo.PNG'
 
 class CustomLayout extends React.Component {
 
@@ -24,7 +25,7 @@ class CustomLayout extends React.Component {
 <div class="row align-items-center">
 	<div class="col-lg-2 col-6">
 		<Link to='/' href="http://bootstrap-ecommerce.com" class="brand-wrap">
-			<img class="logo" src="images/logo.png"></img>
+			<img class="logo" src={logo}></img>
 		</Link>
 	</div>
 	<div class="col-lg-6 col-12 col-sm-12">
@@ -79,24 +80,13 @@ class CustomLayout extends React.Component {
 
     <div class="collapse navbar-collapse" id="main_nav">
       <ul class="navbar-nav">
-      	<li class="nav-item dropdown">
-          <a class="nav-link pl-0" data-toggle="dropdown" href="#"><strong> <i class="fa fa-bars"></i> &nbsp  All category</strong></a>
-          <div class="dropdown-menu">
-            <a class="dropdown-item" href="#">Foods and Drink</a>
-            <a class="dropdown-item" href="#">Home interior</a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item" href="#">Category 1</a>
-            <a class="dropdown-item" href="#">Category 2</a>
-            <a class="dropdown-item" href="#">Category 3</a>
-          </div>
-        </li>
         {menuItems.map(item => {
           return (
           <li class="nav-item">
           <Link 
           to={`/category/${item.label}`}
-          >{item.name}</Link>
-        </li>
+          className="nav-link">{item.name}</Link>
+          </li>
           )
         })}
       </ul>
