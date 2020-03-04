@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from django.conf import settings
 from rest_framework.generics import RetrieveAPIView, CreateAPIView
 from rest_framework.response import Response
-import django_filters
 from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.http import Http404

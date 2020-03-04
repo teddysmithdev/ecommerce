@@ -38,9 +38,7 @@ django-countries = "*"
 pillow = "*"
 stripe = "*"
 python-decouple = "*"
-django-filters = "*"
 djangorestframework-filters = "*"
-django-filter = "*"
 
 [requires]
 python_version = "3.7"
