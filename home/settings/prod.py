@@ -1,6 +1,7 @@
 '''Use this for production'''
 
 from .base import *
+from decouple import config
 
 DEBUG = False
 ALLOWED_HOSTS += ['dj-react-ecommerce.herokuapp.com']
@@ -23,5 +24,8 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
+
+STRIPE_PUBLIC_KEY = config('STRIPE_TEST_PUBLIC_KEY')
+STRIPE_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
