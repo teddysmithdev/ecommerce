@@ -39,6 +39,7 @@ pillow = "*"
 stripe = "*"
 python-decouple = "*"
 djangorestframework-filters = "*"
+whitenoise = "*"
 
 [requires]
 python_version = "3.7"
