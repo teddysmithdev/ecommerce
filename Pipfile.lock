@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "84e397149813bbb4ca807aab64af380ff74cf22ab8d360960d283093891af9cc"
+            "sha256": "93cd2de92a478f928b0ca5a32e91087dd664328a110cb2f1601b784873340c7c"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -46,14 +46,6 @@
             ],
             "index": "pypi",
             "version": "==3.0.4"
-        },
-        "colorama": {
-            "hashes": [
-                "sha256:7d73d2a99753107a36ac6b455ee49046802e59d9d076ef8e47b61499fa29afff",
-                "sha256:e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"
-            ],
-            "markers": "sys_platform == 'win32'",
-            "version": "==0.4.3"
         },
         "defusedxml": {
             "hashes": [
@@ -109,11 +101,11 @@
         },
         "djangorestframework": {
             "hashes": [
-                "sha256:376f4b50340a46c15ae15ddd0c853085f4e66058f97e4dbe7d43ed62f5e60651",
-                "sha256:c12869cfd83c33d579b17b3cb28a2ae7322a53c3ce85580c2a2ebe4e3f56c4fb"
+                "sha256:5cc724dc4b076463497837269107e1995b1fbc917468d1b92d188fd1af9ea789",
+                "sha256:a5967b68a04e0d97d10f4df228e30f5a2d82ba63b9d03e1759f84993b7bf1b53"
             ],
             "index": "pypi",
-            "version": "==3.9.4"
+            "version": "==3.11.2"
         },
         "djangorestframework-filters": {
             "hashes": [
